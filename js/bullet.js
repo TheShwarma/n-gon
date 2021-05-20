@@ -2369,6 +2369,9 @@ const b = {
         };
         bullet[me].do = function() {};
     },
+    bacteria() {
+
+    }, 
     // **************************************************************************************************
     // **************************************************************************************************
     // ********************************         Bots        *********************************************
@@ -4720,7 +4723,66 @@ const b = {
             //         b.pulse(energy, m.angle)
             //     }
             // },
-        },
+        }, {
+            name: "bacteria",
+            description: "creates a cloud of cateria which <strong class='color-s'>infects</strong> mobs<br> and deals slow <strong class='color-h'>damage</strong> over time",
+            ammo: 0,
+            ammoPack: 10,
+            have: false,
+            // cooldown: false,
+            do() {
+                // if (true) {
+                //     //draw charge level
+                //     ctx.fillStyle = "rgba(0,50,50,0.3)";
+                //     ctx.beginPath();
+                //     const radius = 10 * Math.sqrt(this.charge)
+                //     const mag = 11 + radius
+                //     ctx.arc(m.pos.x + mag * Math.cos(m.angle), m.pos.y + mag * Math.sin(m.angle), radius, 0, 2 * Math.PI);
+                //     ctx.fill();
+
+                //     if (this.isDischarge) {
+                //         this.charge--
+                //         this.fireFoam()
+                //         m.fireCDcycle = m.cycle + 1; //disable firing and adding more charge
+                //     } else if (!input.fire) {
+                //         this.isDischarge = true;
+                //     }
+                // } else {
+                //     this.isDischarge = false
+                // }
+            },
+            fire() {
+                const speed = 20 + 10 * Math.random();
+                const dir = m.angle + 0.3 * (Math.random());
+                const velocity = {
+                    x: speed * Math.cos(dir),
+                    y: speed * Math.sin(dir)
+                }
+                const position = {
+                    x: m.pos.x + 30 * Math.cos(m.angle),
+                    y: m.pos.y + 30 * Math.sin(m.angle)
+                }
+                b.foam(position, velocity, 5);
+                // if (tech.foamFutureFire) {
+                //     simulation.drawList.push({ //add dmg to draw queue
+                //         x: position.x,
+                //         y: position.y,
+                //         radius: 5,
+                //         color: "rgba(0,50,50,0.3)",
+                //         time: 15 * tech.foamFutureFire
+                //     });
+                //     setTimeout(() => {
+                //         if (!simulation.paused) {
+                //             b.foam(position, Vector.rotate(velocity, spread), radius)
+                //             bullet[bullet.length - 1].damage = (1 + 0.9 * tech.foamFutureFire) * (tech.isFastFoam ? 0.048 : 0.012) //double damage
+                //         }
+                //     }, 300 * tech.foamFutureFire);
+                // } else {
+                    
+                // }
+                m.fireCDcycle = m.cycle + Math.floor((m.crouch ? 20 : 25) + b.fireCD);
+            }
+        }
     ],
     gunRewind: { //this gun is added with a tech
         name: "CPT gun",
@@ -4764,5 +4826,5 @@ const b = {
             }
             this.lastFireCycle = m.cycle;
         }
-    }
+    },
 };
