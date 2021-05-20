@@ -29,7 +29,11 @@ const level = {
 
             level.intro(); //starting level
             // level.testing(); //not in rotation
+<<<<<<< Updated upstream
             // level.template(); //blank start new map development
+=======
+            // level.park();
+>>>>>>> Stashed changes
             // level.final() //final boss level
             // level.gauntlet(); //before final boss level
             // level.testChamber() //less mobs, more puzzle
@@ -1038,6 +1042,10 @@ const level = {
         spawn.mapRect(475, -25, 25, 50); //edge shelf
     },
     testing() {
+        levelLoader.levelFromFile('testing');
+        spawn.starter(0, 10, 200);
+    },
+    testing2() {
         const button = level.button(200, -700)
         level.custom = () => {
             button.query();
@@ -1056,8 +1064,8 @@ const level = {
         level.exit.y = -230;
 
         // level.difficultyIncrease(14); //hard mode level 7
-        spawn.setSpawnList();
-        spawn.setSpawnList();
+        // spawn.setSpawnList();
+        // spawn.setSpawnList();
         level.defaultZoom = 1500
         simulation.zoomTransition(level.defaultZoom)
         document.body.style.backgroundColor = "#ddd";
@@ -1105,10 +1113,10 @@ const level = {
         // spawn.striker(1600, -500)
         // spawn.laserTargetingBoss(1700, -120)
         // spawn.bomberBoss(1400, -500)
-        spawn.ghoster(1800, -120)
-        spawn.ghoster(1800, -120)
-        spawn.ghoster(1800, -120)
-        spawn.ghoster(1800, -120)
+        // spawn.ghoster(1800, -120)
+        // spawn.ghoster(1800, -120)
+        // spawn.ghoster(1800, -120)
+        // spawn.ghoster(1800, -120)
         // spawn.streamBoss(1600, -500)
         // spawn.orbitalBoss(1600, -500)
         // spawn.cellBossCulture(1600, -500)
@@ -1147,6 +1155,62 @@ const level = {
         // if (simulation.difficulty > 3) spawn.randomLevelBoss(2200, -1300);
         powerUps.addRerollToLevel() //needs to run after mobs are spawned
         // if (tech.isDuplicateBoss && Math.random() < 2 * tech.duplicationChance()) spawn.randomLevelBoss(4800, -500); 
+    },
+    park() {
+        // --- INITIALIZE LEVEL ---
+        simulation.enableConstructMode();
+        level.custom = () => {
+            level.playerExitCheck();
+            level.exit.draw();
+            level.enter.draw();
+        };
+        level.customTopLayer = () => {};
+        level.setPosToSpawn(0, -50); //normal spawn
+        level.exit.x = 1500;
+        level.exit.y = -1875;
+        // --- LEVEL ENTRY POWERUPS ---
+        powerUps.spawn(500, -120, "heal");
+        powerUps.spawn(500, -120, "heal");
+
+        powerUps.spawn(500, -120, "ammo");
+        powerUps.spawn(500, -120, "ammo");
+        if (Math.random() > 0.9) powerUps.spawn(500, -120, "tech"); // low chance
+
+        // --- MAIN --
+        spawn.mapRect(level.enter.x, level.enter.y + 20, 100, 20);
+
+        spawn.mapRect(-200, -325, 100, 425); // wall
+        spawn.mapRect(-100, 0, 1000, 100); // spawn patform
+        spawn.mapRect(825, 100, 75, 200);
+        spawn.mapRect(-200, -375, 1100, 100); // the ceiling, you can climb it:
+        // - EASTER EGG -
+        // after climbing, the player can walk on blocks on the bottom left until reaching a massive heal.
+        // getting back up is another story -- jump into the void or use a field.
+        spawn.mapRect(-3500, 3000, 3275, 25);
+        spawn.mapRect(-3850, 2975, 350, 50);
+        spawn.mapRect(-3775, 2950, 225, 25);
+        powerUps.spawn(-3700, 2900, "heal", false, null, 100);
+
+        // - PARK START -
+        spawn.mapRect(900, 225, 1350, 75);
+        spawn.mapRect(1200, 200, 525, 25);
+        spawn.mapRect(1625, 125, 25, 75);
+        spawn.mapRect(1275, 125, 25, 75);
+        // soft body, taken from the soft body matter.js example
+       
+        // spawn.bodyRect(1300, 125, 325, 75, { inertia: Infinity });
+
+        // World.add(Composites.softBody(1300, 125, 5, 3, 0, 0, true, 3))
+
+        // level.hazard(900, 1575, 3850, 100, 0, "#bff2ff");
+
+        level.defaultZoom = 1800
+        simulation.zoomTransition(level.defaultZoom)
+        document.body.style.backgroundColor = "#dcdcde";
+
+    
+        powerUps.addRerollToLevel() //needs to run after mobs are spawned
+        if (tech.isDuplicateBoss && Math.random() < 2 * tech.duplicationChance()) spawn.randomLevelBoss(4800, -500); 
     },
     final() {
         level.custom = () => {
