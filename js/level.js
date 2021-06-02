@@ -1105,6 +1105,7 @@ const level = {
         // spawn.shooterBoss(1900, -500)
         
         b.giveGuns("laser");
+        b.giveGuns("foam");
         b.giveGuns("missiles");
         b.giveGuns("grenades");
 

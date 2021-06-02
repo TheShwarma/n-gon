@@ -2939,7 +2939,7 @@ const spawn = {
                 this.checkStatus();
                 this.attraction();
                 
-                if (radius < maximumRadius) {
+                if (radius < maximumRadius && !this.isStunned && !this.isSlowed) {
                     Matter.Body.scale(this, growScale, growScale);
                     radius *= growScale;
                     this.radius = radius; // physically update the radius
