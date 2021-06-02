@@ -2872,7 +2872,7 @@ const spawn = {
             }
         };
     },
-    hydra(x, y, radius = maximumRadius, maximumRadius = 100, minSplitRadius = maximumRadius * 0.7, cloneDepth = 0) {
+    hydra(x, y, radius = 100, maximumRadius = 100, minSplitRadius = maximumRadius * 0.7, cloneDepth = 0) {
         // TheShwarma 2021
         // *maximumRadius* is the maximum radius of the mob. If the radius is lesser than the maximum radius,
         // it'll slow grow to that size. Make sure it's an integer!
@@ -2904,6 +2904,21 @@ const spawn = {
         mobs.spawn(x, y, sides, radius, "#000"); // rgb is a placeholder
         let me = mob[mob.length - 1];
         me.mass = me.mass * 2; // more dense than it seems
+        if (cloneDepth != 0) { // the mob was cloned
+            if (Math.random() > 0.5) {
+                // high chance of making the mob explosion proof
+                const currentHealth = me.health;
+                me.health = Infinity;
+                setTimeout(() => {
+                    me.health = currentHealth
+                }, 200)
+            }
+            // give it a velocity
+            const angle = 2 * Math.PI * Math.random();
+            // never thought I'd do such complex math
+            const velcVector = {x: Math.sin(angle) * 5 * Math.random(), y: Math.cos(angle) * 5 * Math.random()};
+            Matter.Body.setVelocity(me, velcVector);
+        }
 
         // this function adds a side to an existing polygon
         const regenSides = body => {
