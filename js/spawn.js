@@ -2881,9 +2881,9 @@ const spawn = {
         // note to myself - the random in range forumla - Math.random() * (max - min) + min
         // --- CONSTANTS ---
 
-        const maxCloneDepth = 3;
+        const maxCloneDepth = 2;
         const splitAmount = 3;
-        const growScale = 1.003;
+        const growScale = 1.0025;
 
         const sidesFun = () => {
             // it's used twice, might as well make it a constant lambda
@@ -2898,8 +2898,6 @@ const spawn = {
         
        
         // --- MOB SETUP ---
-        // sides is multiplied by two to make sure the polygon has an even number of sides
-
         
         mobs.spawn(x, y, sides, radius, "#000"); // rgb is a placeholder
         let me = mob[mob.length - 1];
@@ -2975,7 +2973,12 @@ const spawn = {
         }
 
         me.onDeath = function() {
-            if (cloneDepth != 0) {
+            if (cloneDepth == 0) {
+                if (Math.random() > 0.6) {
+                    // hydras give a lot of ammo, but only for the original one
+                    powerUps.spawn(this.position.x, this.position.y, 'ammo');
+                }
+            } else {
                 // don't drop powerups for cloned mobs. Otherwise, players will farm
                 this.isDropPowerUp = false;
                 const shrinkScale = 1 / (cloneDepth + 2);
