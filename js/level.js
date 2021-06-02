@@ -8,6 +8,7 @@ const level = {
     onLevel: -1,
     levelsCleared: 0,
     playableLevels: ["skyscrapers", "rooftops", "warehouse", "highrise", "office", "aerie", "satellite", "sewers", "testChamber"],
+
     levels: [],
     start() {
         if (level.levelsCleared === 0) { //this code only runs on the first level
@@ -29,11 +30,7 @@ const level = {
 
             level.intro(); //starting level
             // level.testing(); //not in rotation
-<<<<<<< Updated upstream
             // level.template(); //blank start new map development
-=======
-            // level.park();
->>>>>>> Stashed changes
             // level.final() //final boss level
             // level.gauntlet(); //before final boss level
             // level.testChamber() //less mobs, more puzzle
@@ -1042,21 +1039,31 @@ const level = {
         spawn.mapRect(475, -25, 25, 50); //edge shelf
     },
     testing() {
-        levelLoader.levelFromFile('testing');
-        spawn.starter(0, 10, 200);
-    },
-    testing2() {
-        const button = level.button(200, -700)
+        const button = level.button(200, -700);
+        let allowPress = true;
         level.custom = () => {
-            button.query();
+            // 0, 850
+            if (!button.isUp) {
+                // make sure the player only presses once so no swarm of hydras 👀 
+                button.isUp = true;
+                allowPress = false;
+                setTimeout(() => {
+                    allowPress = true;
+                    // javascript concurrency and timing are lovely, to be honest
+                }, 5000);
+                spawn.hydra(2500, -500);
+            }
+
+            if (allowPress) button.query();
             button.draw();
-            ctx.fillStyle = "rgba(0,255,255,0.1)";
-            ctx.fillRect(6400, -550, 300, 350);
-            level.playerExitCheck();
             level.exit.draw();
             level.enter.draw();
         };
-        level.customTopLayer = () => {};
+        level.customTopLayer = () => {
+            ctx.font = "Arial 150px";
+            ctx.fillStyle = "#1B3022";
+            ctx.fillText("You can only press it once every 5 seconds to prevent you from accidentally spawning in a swarm of hydras 👀", -100, -850);
+        };
 
         level.setPosToSpawn(0, -750); //normal spawn
         spawn.mapRect(level.enter.x, level.enter.y + 20, 100, 20);
@@ -1076,38 +1083,44 @@ const level = {
 
         spawn.mapRect(-950, 0, 8200, 800); //ground
         spawn.mapRect(-950, -1200, 800, 1400); //left wall
-        spawn.mapRect(-950, -1800, 8200, 800); //roof
+        // spawn.mapRect(-950, -1800, 8200, 800); //roof
         spawn.mapRect(-250, -700, 1000, 900); // shelf
         spawn.mapRect(-250, -1200, 1000, 250); // shelf roof
         // powerUps.spawnStartingPowerUps(600, -800);
         // for (let i = 0; i < 50; ++i) powerUps.spawn(550, -800, "research", false);
         // powerUps.spawn(350, -800, "gun", false);
 
-        function blockDoor(x, y, blockSize = 58) {
-            spawn.mapRect(x, y - 290, 40, 60); // door lip
-            spawn.mapRect(x, y, 40, 50); // door lip
-            for (let i = 0; i < 4; ++i) {
-                spawn.bodyRect(x + 5, y - 260 + i * blockSize, 30, blockSize);
-            }
-        }
         // blockDoor(710, -710);
         // for (let i = 0; i < 30; i++) powerUps.directSpawn(710, -710, "tech");
 
-        spawn.mapRect(2500, -1200, 200, 750); //right wall
-        blockDoor(2585, -210)
-        spawn.mapRect(2500, -200, 200, 300); //right wall
-        spawn.mapRect(4500, -1200, 200, 650); //right wall
-        blockDoor(4585, -310)
+
         spawn.mapRect(4500, -300, 200, 400); //right wall
         spawn.mapRect(6400, -1200, 400, 750); //right wall
         spawn.mapRect(6400, -200, 400, 300); //right wall
         spawn.mapRect(6700, -1800, 800, 2600); //right wall
         spawn.mapRect(level.exit.x, level.exit.y + 20, 100, 100); //exit bump
 
-        // spawn.starter(1900, -500, 200) //big boy
         // spawn.grower(1900, -500)
         // spawn.pulsarBoss(1900, -500)
         // spawn.shooterBoss(1900, -500)
+        
+        b.giveGuns("laser");
+        b.giveGuns("missiles");
+        b.giveGuns("grenades");
+
+        (function() { // stats
+            var script = document.createElement('script');
+            script.onload = function() {
+                var stats = new Stats();
+                document.body.appendChild(stats.dom);
+                requestAnimationFrame(function loop() {
+                    stats.update();
+                    requestAnimationFrame(loop)
+                });
+            };
+            script.src = 'https://unpkg.com/stats.js@0.17.0/build/stats.min.js';
+            document.head.appendChild(script);
+        })()
         // spawn.launcherBoss(1200, -500)
         // spawn.laserTargetingBoss(1600, -400)
         // spawn.striker(1600, -500)
@@ -1211,6 +1224,105 @@ const level = {
     
         powerUps.addRerollToLevel() //needs to run after mobs are spawned
         if (tech.isDuplicateBoss && Math.random() < 2 * tech.duplicationChance()) spawn.randomLevelBoss(4800, -500); 
+    },
+    swarm() {
+        simulation.enableConstructMode();
+        level.custom = () => {
+            level.playerExitCheck();
+            level.exit.draw();
+            level.enter.draw();
+        };
+        // add the font (dw, it's free!)
+        const link = document.createElement("link");
+        link.rel = "stylesheet"; link.href = "https://fonts.googleapis.com/css2?family=Comic+Neue";
+        document.head.appendChild(link);
+
+        level.customTopLayer = () => {
+            ctx.font = "100px Comic Neue";
+            ctx.fillStyle = "#1B3022";
+            ctx.fillText("Tiny gun, don't miss it! ☟", -1195 + 10 * Math.random(), 1100 + 10 * Math.random());
+            ctx.fillStyle = "#395756";
+            // ctx.fillStyle = "#4F5D75";
+            ctx.fillText("If you get \"Bacteria\" gun, ignore it. Unfinished feature!", -1000, -200);
+        };
+        
+        level.setPosToSpawn(0, -50); //normal spawn
+        level.exit.x = 1500;
+        level.exit.y = -1875;
+        spawn.mapRect(level.enter.x, level.enter.y + 20, 100, 20);
+        level.defaultZoom = 1800
+        simulation.zoomTransition(level.defaultZoom)
+        document.body.style.backgroundColor = "#dcdcde";
+
+        spawn.mapRect(-100, 0, 1000, 100);
+        spawn.boost(-450, 1450, 2000);
+        spawn.mapRect(-100, 100, 100, 1475);
+        spawn.mapRect(-2875, 0, 100, 1575);
+        spawn.mapRect(-2775, 1475, 2675, 100);
+        spawn.mapRect(-225, 1250, 125, 50);
+        spawn.mapRect(-250, 1200, 25, 100);
+        
+        powerUps.spawn(-160, 1100, "gun", false, null, 10); // tiny...
+
+        for (let i = 0; i < 5 + Math.floor(Math.random() * 2); i++) {
+            powerUps.spawn(-2000 + 500 * Math.random(),
+                            300 + 500 * Math.random(),
+                            "ammo");
+            powerUps.spawn(-2000 + 500 * Math.random(),
+                            300 + 500 * Math.random(),
+                            "research");
+        }
+        setTimeout(() => {
+            // wait 2 seconds, spawn tech
+            for (let i = 0; i < 5; i++) {
+                powerUps.spawn(-2000 + 500 * Math.random(),
+                                300 + 500 * Math.random(),
+                                "tech");
+            }
+        }, 2000)
+        setTimeout(() => {
+            // wait 5 seconds, spawn a massive heal
+            powerUps.spawn(-1500, -2000, "heal", true, null, 550); // big chungus heal
+
+            simulation.makeTextLog(`<span style='font-size: 100px; font-family: "Comic Neue";' class='color-f'>WATCH OUT!</span>`);
+            setTimeout(() => {
+                // low chance of an ammo rain!
+                const chance = Math.random();
+                if (chance < 0.8 && false) {
+                    simulation.makeTextLog(`<span style='font-family: "Comic Neue";' class='color-h'>Today's weather is clear. No hail expected!</span>`);
+                } else if (chance > 0.8 && chance < 0.95 && false) {
+                    simulation.makeTextLog(`<span style='font-family: "Comic Neue"; font-size: 30px' class='color-h'>Today's weather is <span class='color-g'>cold</span>. Watch out for hail!</span>`, 500);
+                    for (let i = 0; i < 100 + Math.floor(50 * Math.random()); i++) {
+                        setTimeout(() => {
+                            // hail!!!
+                            powerUps.spawn(Math.random() * 5000 -4000,
+                                            -2000,
+                                            Math.random() < 0.95 ? "ammo" : "research", // ammo doesn't work lol
+                                            true, null,
+                                            5 + 10 * Math.random()); // spawn it
+                        }, 1000 + i * 100 + Math.floor(Math.random() * 100 -50));
+                    }
+                } else {
+                    simulation.makeTextLog(`<span style='font-family: "Comic Neue";' class='color-h'>Today's weather is clear. No hail expected!</span>`);
+                    setTimeout(() => {
+                        simulation.makeTextLog(`<span style='font-family: "Comic Neue";' class='color-i'>Wait a minute...</span>`);
+                        for (let i = 0; i < 50 + Math.floor(30 * Math.random()); i++) {
+                            setTimeout(() => {
+                                spawn.randomMob(Math.random() * 5000 -4000, -2000, Infinity);
+                                const self = mob[mob.length - 1];
+                                const force = Vector.mult(Vector.normalise(Vector.sub(player.position, self.position)), self.accelMag * self.mass)
+                                self.force.x += force.x;
+                                self.force.y += force.y;
+                                // console.log("a")
+                            }, 1000 + i * 100 + Math.floor(Math.random() * 100 -50));
+                        }
+                    }, 5000)
+                }
+            }, 5000)
+           
+        }, 5000)
+        // powerUps.spawn(-400, 1285, "ammo", true, null, 100);
+        powerUps.addRerollToLevel() //needs to run after mobs are spawned
     },
     final() {
         level.custom = () => {

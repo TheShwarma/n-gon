@@ -1,28 +1,9 @@
 //main object for spawning things in a level
 const spawn = {
     pickList: ["starter", "starter"],
-    fullPickList: [
-        "hopper", "hopper", "hopper",
-        "shooter", "shooter",
-        "striker", "striker",
-        "laser", "laser",
-        "exploder", "exploder",
-        "stabber", "stabber",
-        "launcher", "launcher",
-        "springer", "springer",
-        "pulsar", "pulsar",
-        "sucker",
-        "chaser",
-        "sniper",
-        "spinner",
-        "grower",
-        "beamer",
-        "focuser",
-        "spawner",
-        "ghoster",
-        "sneaker",
+    fullPickList: [ "hydra"
     ],
-    allowedGroupList: ["chaser", "spinner", "striker", "springer", "laser", "focuser", "beamer", "exploder", "spawner", "shooter", "launcher", "stabber", "sniper", "pulsar"],
+    allowedGroupList: ["hydra"],
     setSpawnList() { //this is run at the start of each new level to determine the possible mobs for the level
         //each level has 2 mobs: one new mob and one from the last level
         spawn.pickList.splice(0, 1);
@@ -2890,6 +2871,208 @@ const spawn = {
                 }
             }
         };
+    },
+    hydra(x, y, maximumRadius = 100, radius = maximumRadius, minSplitRadius = maximumRadius * 0.7, cloneDepth = 0) {
+        // TheShwarma 2021
+        // *maximumRadius* is the maximum radius of the mob. If the radius is lesser than the maximum radius,
+        // it'll slow grow to that size. Make sure it's an integer!
+        // *cloneDepth* is the number of times the entity has been cloned, and the maximum is defined below
+        // as maxCloneDepth. The more the hydra clones, the higher the chance of mutating.
+        // note to myself - the random in range forumla - Math.random() * (max - min) + min
+        // --- CONSTANTS ---
+
+        const maxCloneDepth = 3;
+        const splitAmount = 3;
+        const growScale = 1.003;
+
+        const sidesFun = () => {
+            // it's used twice, might as well make it a constant lambda
+            return Math.floor(radius / (maximumRadius >> 1)) + 3;
+        }
+
+        // --- VALUE CALCULATIONS ---
+
+        // change the blue value to the radius. If the radius is too big, clamp it.
+        // it is impossible to use integral numbers for canvas colors 😔, I won't be using hex codes then
+        let sides = sidesFun();
+        
+       
+        // --- MOB SETUP ---
+        // sides is multiplied by two to make sure the polygon has an even number of sides
+
+        
+        mobs.spawn(x, y, sides, radius, "#000"); // rgb is a placeholder
+        let me = mob[mob.length - 1];
+        me.mass = me.mass * 2; // more dense than it seems
+
+        // this function adds a side to an existing polygon
+        const regenSides = body => {
+            // DOESN'T CURRENTLY WORK
+            const ghostSelf = Bodies.polygon(body.position.x, body.position.y, body.vertices.length + 1, body.radius);
+            body.vertices = ghostSelf.vertices;
+        }
+        // mob custom variables
+        me.vdCtr = 0; // once this equals 0, the program will check and possibly update the vertices.
+                          // stands for vertex detection counter.
+        me.transCtr = 0; // transition counter
+        // set mob behavior
+
+        me.do = function() {
+            if (!m.isBodiesAsleep) {
+                // the fill is affected by the radius
+                const blue = radius + 100;
+                this.fill = `rgb(255,126,${blue > 255 ? 255 : blue})`;
+                this.seePlayerByLookingAt();
+                this.checkStatus();
+                this.attraction();
+                
+                if (radius < maximumRadius) {
+                    Matter.Body.scale(this, growScale, growScale);
+                    radius *= growScale;
+                    this.radius = radius; // physically update the radius
+                }
+                if (radius > minSplitRadius) {
+                    // transition in color
+                    if (this.transCtr <= 90) {
+                        if (this.transCtr % 10 === 0) {
+                            // if the mob can clone, the stroke will become more blue. If the mob can't clone anymore,
+                            // the stroke will become more red.
+                            this.stroke = cloneDepth == maxCloneDepth ? `#${this.transCtr / 10}00` : `#00${this.transCtr / 10}`;
+                        }
+                        this.transCtr++;
+                    }
+                    
+                }
+
+                if (this.vdCtr == 10) {
+                    this.vdCtr = 0;
+                    // I won't run it any tick for performance. I know these calculations aren't hard
+                    // but I want it to be the fastest it can be
+                    // recalculate sides. If there was a change, increase vertices by one
+                    const checkSize = sidesFun();
+                    if (checkSize != sides) {
+                        sides = checkSize;
+                        regenSides(me);
+                    }
+                } else this.vdCtr++;
+            }
+
+        }
+
+        me.onDeath = function() {
+            if (cloneDepth != 0) {
+                // don't drop powerups for cloned mobs. Otherwise, players will farm
+                this.isDropPowerUp = false;
+                const shrinkScale = 1 / (cloneDepth + 2);
+                Matter.Body.scale(this, shrinkScale, shrinkScale);
+            }
+        }
+
+        me.split = function() {
+            if (cloneDepth >= maxCloneDepth) {
+                // it can never clone
+                return;
+            }
+
+            if (radius > minSplitRadius) { // if it's big enough to split, then split
+                for (let i = 0; i < splitAmount; i++) {
+                    // TODO give velocity
+                    spawn.hydra(this.position.x, this.position.y, maximumRadius, Math.floor(radius) >> 1, minSplitRadius, cloneDepth + 1);
+                }
+                me.death(); // silent kill
+            }
+        }
+
+        me.onDamage = me.split;
+        // me.onCollision = me.split;
+
+
+    },
+    neutronCore(x, y) {
+        mobs.spawn(x, y, 8, 100, "#FFFF33");
+        let me = mob[mob.length - 1];
+        me.do = () => {}
+    },
+    neutronStarBoss(x, y, radius = 50, sides = 20) {
+        // --- BOSS DATA ---
+
+        let wave = 1; // game wave
+        let isInitialized = false; // becomes true when the boss sees the player and the fight starts
+        // charging values
+
+        // --- INITIALIZATION ---
+
+        mobs.spawn(x, y, sides, radius, "#FFFFFF");
+        let me = mob[mob.length - 1];
+        Matter.Body.setDensity(me, 0.03); // becomes dense as hell
+        // generate the small cores
+
+
+        /// --- FUNCTIONS ---
+
+
+        me.init = () => {
+            // todo
+            for (let i = 0; i < 3; i++) {
+                // this.neutronCore(x, y);
+                // setTimeout(() => {
+                //     consBB.push(Constraint.create({
+                //         bodyA: me,
+                //         bodyB: mob[mob.length - 1 - i],
+                //         stiffness: 1000
+                //     }));
+                // }, 1000 * i)
+                
+            }
+            isInitialized = true;
+        }
+
+        me.do = () => {
+            // animations
+            
+            if (!(simulation.cycle % me.seePlayerFreq)) {
+                if (me.distanceToPlayer2() < me.seeAtDistance2) { //&& !m.isCloak   ignore cloak for black holes
+                    me.locatePlayer();
+                    if (!me.seePlayer.yes) me.seePlayer.yes = true;
+                } else if (me.seePlayer.recall) {
+                    me.lostPlayer();
+                }
+            }
+            me.checkStatus();
+            if (me.seePlayer.yes) {
+                if (!isInitialized) {
+                    me.init();
+                }
+                me.facePlayer()
+            }
+            // me.curl();
+
+            for (let val of bullet) {
+                // deflect bullets towards player
+                const dx = me.position.x - val.position.x;
+                const dy = me.position.y - val.position.y;
+                const distance =  Math.sqrt(dx * dx + dy * dy);
+                if (distance < 700) {
+                    // close enough to deflect, handle deflection for each bullet
+                    if (val.lockedOn != undefined) {
+                        // missile!
+                        val.lockedOn = player; //heheheh
+                        val.lookFrequency = Infinity;
+                    }
+                    
+                    // val.velocity = Vector.sub(me.position, player.position);
+                }
+            }
+
+        }
+
+        // me.onCollision() {
+
+        // }
+
+        
+
+        
     },
     seeker(x, y, radius = 8, sides = 6) {
         //bullets

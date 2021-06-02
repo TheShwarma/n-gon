@@ -135,6 +135,26 @@
                 </div>
             </details>
         </div>
+        <div id="editor">
+            <details>
+                <summary>level editor</summary>
+                <div style="line-height: 150%;" class="details-div">
+                    <b>create new level</b><br>
+                    <label for="new-level-name">level name:</label>
+                    <input type="text" id="new-level-name" name="new-level-name" style="width:100px; height:17px;">
+                    <br>
+                    <button onclick="levelEditor.createLevel(document.getElementById('new-level-name').value);" style="font-size:15px; width:200px; height:30px; display: block; margin: auto;">create</button>
+                    <!-- spaces dont work for some reason... -->
+                    <!-- todo add multi creators editor -->
+                    <b>edit existing level</b><br>
+                    <select name="level-selction" id="level-selction" onChange="levelEditor.editLevel(this.value)" style="width:200px">
+                        <option value="undephined">undephined</option>
+                    </select>
+                    <button onclick="levelEditor.editLevel(document.getElementById('level-selction').value);" style="font-size:15px; width:200px; height:30px; display: block; margin: auto;">load</button>
+
+                </div>
+            </details>
+        </div>
         <div>
             <details id="control-details">
                 <summary>controls</summary>
@@ -556,6 +576,7 @@
     <script src='lib/matter.min.js'></script>
     <script src='lib/decomp.min.js'></script>
     <script src='lib/randomColor.min.js'></script>
+    <script src="js/levelEditor.js"></script>
     <script src="js/simulation.js"></script>
     <script src="js/player.js"></script>
     <script src="js/powerup.js"></script>
