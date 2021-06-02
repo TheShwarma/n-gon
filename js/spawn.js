@@ -2872,7 +2872,7 @@ const spawn = {
             }
         };
     },
-    hydra(x, y, maximumRadius = 100, radius = maximumRadius, minSplitRadius = maximumRadius * 0.7, cloneDepth = 0) {
+    hydra(x, y, radius = maximumRadius, maximumRadius = 100, minSplitRadius = maximumRadius * 0.7, cloneDepth = 0) {
         // TheShwarma 2021
         // *maximumRadius* is the maximum radius of the mob. If the radius is lesser than the maximum radius,
         // it'll slow grow to that size. Make sure it's an integer!
@@ -2977,7 +2977,7 @@ const spawn = {
             if (radius > minSplitRadius) { // if it's big enough to split, then split
                 for (let i = 0; i < splitAmount; i++) {
                     // TODO give velocity
-                    spawn.hydra(this.position.x, this.position.y, maximumRadius, Math.floor(radius) >> 1, minSplitRadius, cloneDepth + 1);
+                    spawn.hydra(this.position.x, this.position.y, Math.floor(radius) >> 1, maximumRadius, minSplitRadius, cloneDepth + 1);
                 }
                 me.death(); // silent kill
             }
