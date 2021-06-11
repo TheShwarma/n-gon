@@ -3006,6 +3006,68 @@ const spawn = {
 
 
     },
+    rocketeer(x, y, radius = 50) {
+        Vector.middle = (vec1, vec2) => {
+            return {
+                x: (vec1.x + vec2.x) / 2,
+                y: (vec1.y + vec2.y) / 2
+            };
+        }
+
+        mobs.spawn(x, y, 4, radius, "#FFFF80");
+        let me = mob[mob.length - 1];
+        me.vertices = Matter.Vertices.rotate(me.vertices, Math.PI, me.position);
+
+        let fireCycle = 0;
+        let isOpening = false;
+        let openCycle = 0;
+        let origVert = null;
+        const rockets = [];
+        me.do = function() {
+            this.seePlayerByLookingAt();
+            this.checkStatus();
+            this.attraction();
+            if (this.speed > 3) {
+                Matter.Body.setVelocity(this, {
+                    x: this.velocity.x * 0.99,
+                    y: this.velocity.y * 0.99
+                });
+            }
+            if (!m.isBodiesAsleep) {
+                const setNoseShape = () => {
+                    const mag = this.radius + this.radius * this.noseLength;
+                    this.vertices[1].x = this.position.x + Math.cos(this.angle) * mag;
+                    this.vertices[1].y = this.position.y + Math.sin(this.angle) * mag;
+                };
+                if (this.seePlayer.recall) {
+                    if (!(simulation.cycle % this.seePlayerFreq)) {
+                        this.fireDir = Vector.normalise(Vector.sub(this.seePlayer.position, this.position));
+                    }
+                    if (fireCycle % 100 == 0 && !isOpening) {
+                        // fire
+                        isOpening = true;
+                    }
+                }
+                if (isOpening) {
+                    // can fire
+                    if (!origVert) {
+                        origVert = this.vertices;
+                    }
+                    const nextVert = origVert.map(Vector.clone); // clone
+                    const middle = Vector.middle(nextVert[0], nextVert[1]);
+                    const cycle = {x: openCycle, y: openCycle};
+                    nextVert.push(Vector.add(middle, cycle));
+                    nextVert.push(Vector.sub(middle, cycle));
+                    this.vertices = nextVert;
+                    if (openCycle++ == 100) {
+                        openCycle = 0;
+                        isOpening = false;
+                    };
+                }
+                fireCycle++;
+            }
+        };
+    },
     neutronCore(x, y) {
         mobs.spawn(x, y, 8, 100, "#FFFF33");
         let me = mob[mob.length - 1];

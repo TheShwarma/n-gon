@@ -28,8 +28,8 @@ const level = {
             // tech.giveTech("metastability")
 
 
-            level.intro(); //starting level
-            // level.testing(); //not in rotation
+            // level.skyfortress(); //starting level
+            level.testing(); //not in rotation
             // level.template(); //blank start new map development
             // level.final() //final boss level
             // level.gauntlet(); //before final boss level
@@ -1051,7 +1051,7 @@ const level = {
                     allowPress = true;
                     // javascript concurrency and timing are lovely, to be honest
                 }, 5000);
-                spawn.hydra(2500, -500);
+                spawn.rocketeer(2500, -500);
             }
 
             if (allowPress) button.query();
@@ -1901,6 +1901,7 @@ const level = {
         powerUps.addRerollToLevel() //needs to run after mobs are spawned
         if (tech.isDuplicateBoss && Math.random() < 2 * tech.duplicationChance()) spawn.randomLevelBoss(1925, -1250);
     },
+    
     sewers() {
         const rotor = level.rotor(5100, 2475, -0.001)
         const button = level.button(6600, 2675)
@@ -5394,4 +5395,221 @@ const level = {
             portal2[2].draw()
         }
     },
+    skyfortress() {
+        // to be removed
+        // simulation.enableConstructMode();
+        b.giveGuns("laser");
+        b.giveGuns("missiles");
+        b.giveGuns("superball");
+
+        const slimePit = level.hazard(-2400, 150, 2050, 600, 100);
+        const door = level.door(-250, -300, 30, 300, 250);
+        const button = level.button(-422, 0);
+        let toggle = false;
+
+
+        const isOpen = () => {
+            for (let ent in mob) {
+                console.log(ent)
+                const dx = middleVector[0] - ent.position.x;
+                const dy = middleVector[1] - ent.position.y;
+                const dist = dx * dx + dy * dy;
+                console.log(dist);
+            }
+        }
+    
+        level.custom = () => {
+            slimePit.query();
+            button.query();
+            slimePit.draw();
+            button.draw();
+            door.draw();
+    
+            if (button.isUp) {
+                if (toggle == false) {
+                    door.isOpen = true;
+                } else {
+                    door.isOpen = false;
+                }
+            } else {
+                if (toggle == false) {
+                    toggle = true;
+                    door.isOpen = false;
+                }
+            }
+    
+            door.openClose();
+    
+            level.playerExitCheck();
+            // throw new Error();
+            
+        };
+        level.customTopLayer = () => {};
+
+        // const drawLetters = (text, strokeColor = "000", spacing = 10) => {
+        //     const letters = {
+        //         s: []
+        //     }
+        // }; // todo
+    
+        level.defaultZoom = 1500
+        simulation.zoomTransition(level.defaultZoom)
+        document.body.style.backgroundColor = "#ffffff";
+    
+        level.setPosToSpawn(-3800, -50);
+        spawn.mapRect(level.enter.x, level.enter.y + 20, 100, 20);
+
+        level.exit.x = 6800;
+        level.exit.y = -30;
+        spawn.mapRect(level.exit.x, level.exit.y + 20, 100, 20);
+        
+        spawn.mapRect(-2600, -501, 100, 2);
+        spawn.mapRect(-2600, -500, 2, 50);
+        spawn.mapRect(-2600, -451, 100, 2);
+        spawn.mapRect(-2502, -450, 2, 50);
+        spawn.mapRect(-2600, -401, 100, 2);
+    
+        spawn.mapRect(-2400, -501, 100, 2);
+        spawn.mapRect(-2400, -500, 2, 100);
+        spawn.mapRect(-2400, -451, 100, 2);
+        spawn.mapRect(-2302, -450, 2, 50);
+    
+        spawn.mapRect(-2200, -500, 2, 50);
+        spawn.mapRect(-2200, -451, 100, 2);
+        spawn.mapRect(-2102, -500, 2, 50);
+        spawn.mapRect(-2151, -450, 2, 50);
+    
+        spawn.mapRect(-1900, -501, 100, 2);
+        spawn.mapRect(-1900, -500, 2, 100);
+        spawn.mapRect(-1900, -450, 50, 2);
+    
+        spawn.mapRect(-1700, -501, 100, 2);
+        spawn.mapRect(-1700, -500, 2, 100);
+        spawn.mapRect(-1700, -401, 100, 2);
+        spawn.mapRect(-1602, -500, 2, 100);
+    
+        spawn.mapRect(-1500, -501, 100, 2);
+        spawn.mapRect(-1500, -500, 2, 100);
+        spawn.mapRect(-1402, -500, 2, 40);
+        spawn.mapRect(-1500, -461, 100, 2);
+        spawn.mapRect(-1500, -441, 100, 2);
+        spawn.mapRect(-1402, -440, 2, 40);
+    
+        spawn.mapRect(-1300, -501, 100, 2);
+        spawn.mapRect(-1251, -500, 2, 100);
+    
+        spawn.mapRect(-1100, -501, 100, 2);
+        spawn.mapRect(-1100, -500, 2, 100);
+        spawn.mapRect(-1002, -500, 2, 40);
+        spawn.mapRect(-1100, -461, 100, 2);
+        spawn.mapRect(-1100, -441, 100, 2);
+        spawn.mapRect(-1002, -440, 2, 40);
+    
+        spawn.mapRect(-900, -501, 100, 2);
+        spawn.mapRect(-900, -500, 2, 100);
+        spawn.mapRect(-900, -451, 100, 2);
+        spawn.mapRect(-900, -401, 100, 2);
+    
+        spawn.mapRect(-700, -501, 100, 2);
+        spawn.mapRect(-700, -500, 2, 50);
+        spawn.mapRect(-700, -451, 100, 2);
+        spawn.mapRect(-602, -450, 2, 50);
+        spawn.mapRect(-700, -401, 100, 2);
+    
+        spawn.mapRect(-500, -501, 100, 2);
+        spawn.mapRect(-500, -500, 2, 50);
+        spawn.mapRect(-500, -451, 100, 2);
+        spawn.mapRect(-402, -450, 2, 50);
+        spawn.mapRect(-500, -401, 100, 2);
+    
+        spawn.mapRect(-4525, 0, 2125, 800);
+        spawn.mapRect(-450, 0, 7450, 800);
+        spawn.mapRect(-1100, 700, 800, 100);
+        spawn.mapRect(-300, -1400, 100, 1100);
+        spawn.mapRect(-300, -700, 2300, 100);
+        spawn.mapRect(1000, -700, 100, 500);
+        spawn.mapRect(2400, -1400, 100, 1400);
+        spawn.mapRect(1000, -1400, 100, 500);
+        spawn.mapRect(200, -2300, 100, 100);
+        spawn.mapRect(-300, -2400, 100, 700);
+        spawn.mapRect(200, -2400, 100, 700);
+        spawn.mapRect(1900, -2400, 100, 700);
+        spawn.mapRect(2400, -2400, 100, 700);
+        spawn.mapRect(-50, -3200, 100, 900);
+        spawn.mapRect(2150, -3200, 100, 900);
+        spawn.mapRect(200, -1400, 2300, 100);
+        spawn.mapRect(1000, -2000, 200, 100);
+        spawn.mapRect(1400, -1725, 200, 100);
+        spawn.mapRect(600, -1725, 200, 100);
+        spawn.mapRect(-3050, -200, 100, 300);
+    
+        spawn.spawnStairs(2400, 0, 10, 500, 700, true);
+        spawn.spawnStairs(-200, -700, 10, 500, 700, false);
+        spawn.spawnStairs(-25, -2300, 100, 500, 700, true);
+        spawn.spawnStairs(-25, -2300, 100, 500, 700, false);
+        spawn.spawnStairs(2175, -2300, 100, 500, 700, true);
+        spawn.spawnStairs(2175, -2300, 100, 500, 700, false);
+    
+        spawn.bodyRect(1020, -900, 60, 200);
+        spawn.bodyRect(1020, -200, 60, 200);
+    
+        spawn.hopper(-1400, -100);
+        spawn.hopper(-1300, -100);
+        spawn.hopper(-1200, -100);
+    
+        spawn.sniper(-900, -100);
+        spawn.sniper(-800, -200);
+        spawn.sniper(-700, -300);
+    
+        spawn.randomMob(100, -200, 0.6);
+        spawn.randomMob(300, -200, 0.6);
+        spawn.randomMob(500, -200, 0.6);
+        spawn.randomMob(700, -200, 0.6);
+    
+        spawn.randomMob(1300, -200, 0.6);
+        spawn.randomMob(1500, -200, 0.6);
+        spawn.randomMob(1700, -200, 0.6);
+        spawn.randomMob(1900, -200, 0.6);
+    
+        spawn.randomMob(1200, -900, 0.6);
+        spawn.randomMob(1400, -900, 0.6);
+        spawn.randomMob(1600, -900, 0.6);
+        spawn.randomMob(1800, -900, 0.6);
+    
+        spawn.randomMob(300, -900, 0.6);
+        spawn.randomMob(500, -900, 0.6);
+        spawn.randomMob(700, -900, 0.6);
+        spawn.randomMob(900, -900, 0.6);
+    
+        spawn.lineGroup(400, -2800, "pulsar", 3);
+        spawn.lineGroup(1800, -2800, "pulsar", 3);
+        spawn.lineGroup(800, -2600, "sniper", 3);
+        spawn.lineGroup(1400, -2600, "sniper", 3);
+        spawn.lineGroup(1000, -1900, "striker", 6);
+        spawn.lineGroup(1200, -1900, "striker", 6);
+        spawn.randomGroup(600, -2400, 0.3);
+        spawn.randomGroup(800, -2400, 0.3);
+        spawn.randomGroup(1400, -2400, 0.3);
+        spawn.randomGroup(1600, -2400, 0.3);
+    
+        spawn.hopper(3600, 200);
+        spawn.hopper(3800, 200);
+        spawn.hopper(4000, 200);
+        spawn.hopper(4200, 200);
+        spawn.hopper(4400, 200);
+    
+        spawn.hopper(5200, 200);
+        spawn.hopper(5400, 200);
+        spawn.hopper(5600, 200);
+        spawn.hopper(6000, 200);
+    
+        powerUps.spawnStartingPowerUps(1100, -1400);
+        powerUps.addRerollToLevel() //needs to run after mobs are spawned
+    
+        if (tech.isDuplicateBoss && Math.random() < 2 * tech.duplicationChance()) spawn.shieldingBoss(4800, -1000);
+    
+        if (simulation.difficulty > 15) {
+            spawn.randomLevelBoss(4800, -600, ["streamBoss", "shooterBoss", "orbitalBoss", "pulsarBoss", "launcherBoss"]);
+        }
+    }
 };
