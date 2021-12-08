@@ -1,5 +1,3 @@
-
-.jsbeautifyrc
 .DS_Store
-.DS_Store
-.DS_Store
+.vscode
+node_modules
