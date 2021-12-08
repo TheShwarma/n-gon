@@ -1,4 +1,4 @@
-import { engine } from './engine'
+import { engine } from './engine' 
 import { fpsInterval, state, loop } from './simulation'
 
 export var canvas: HTMLCanvasElement
