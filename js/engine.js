@@ -186,6 +186,7 @@ function collisionChecks(event) {
                                 color: simulation.playerDmgColor,
                                 time: simulation.drawTime
                             });
+                            if (tech.isLessDamageReduction && !mob[k].shield) mob[k].damageReduction *= mob[k].isBoss ? 1.01 : 1.06
                             return;
                         }
                         //mob + body collisions

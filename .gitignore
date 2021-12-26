@@ -1,3 +1,6 @@
+
+.jsbeautifyrc
 .DS_Store
-.vscode
-node_modules
+.DS_Store
+.DS_Store
+js/workspace.code-workspace
